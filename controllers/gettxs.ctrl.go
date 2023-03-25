@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"math"
 	"net/http"
+	"strconv"
 
 	"github.com/getAlby/lndhub.go/common"
 	"github.com/getAlby/lndhub.go/lib"
@@ -46,10 +48,18 @@ type IncomingInvoice struct {
 	CustomRecords  map[uint64][]byte `json:"custom_records"`
 }
 
+type InvoicesResponseBody struct {
+	Invoices     *[]IncomingInvoice `json:"invoices"`
+	TotalPages   int                `json:"total_pages"`
+	TotalEntries int                `json:"total_entries"`
+	CurrentPage  int                `json:"current_page"`
+	PageSize     int                `json:"page_size"`
+}
+
 func (controller *GetTXSController) GetTXS(c echo.Context) error {
 	userId := c.Get("UserID").(int64)
 
-	invoices, err := controller.svc.InvoicesFor(c.Request().Context(), userId, common.InvoiceTypeOutgoing)
+	invoices, _, err := controller.svc.InvoicesFor(c.Request().Context(), userId, common.InvoiceTypeOutgoing)
 	if err != nil {
 		return err
 	}
@@ -76,10 +86,31 @@ func (controller *GetTXSController) GetTXS(c echo.Context) error {
 func (controller *GetTXSController) GetUserInvoices(c echo.Context) error {
 	userId := c.Get("UserID").(int64)
 
-	invoices, err := controller.svc.InvoicesFor(c.Request().Context(), userId, common.InvoiceTypeIncoming)
+	limit := 100
+	page := 1
+
+	if c.QueryParam("page_size") != "" {
+		limit, _ = strconv.Atoi(c.QueryParam("page_size"))
+	}
+
+	if c.QueryParam("current_page") != "" {
+		page, _ = strconv.Atoi(c.QueryParam("current_page"))
+	}
+
+	offset := (page - 1) * limit
+
+	pagination := service.Pagination{
+		Limit:  limit,
+		Offset: offset,
+	}
+
+	invoices, totalEntries, err := controller.svc.InvoicesFor(c.Request().Context(), userId, common.InvoiceTypeIncoming, pagination)
+
 	if err != nil {
 		return err
 	}
+
+	totalPages := int(math.Ceil(float64(totalEntries) / float64(limit)))
 
 	response := make([]IncomingInvoice, len(invoices))
 	for i, invoice := range invoices {
@@ -99,5 +130,12 @@ func (controller *GetTXSController) GetUserInvoices(c echo.Context) error {
 			CustomRecords:  invoice.DestinationCustomRecords,
 		}
 	}
-	return c.JSON(http.StatusOK, &response)
+
+	return c.JSON(http.StatusOK, &InvoicesResponseBody{
+		Invoices:     &response,
+		TotalEntries: totalEntries,
+		TotalPages:   totalPages,
+		CurrentPage:  page,
+		PageSize:     limit,
+	})
 }

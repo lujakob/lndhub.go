@@ -119,7 +119,7 @@ func createWebsocketUpgrader(c echo.Context) (conn *websocket.Conn, done chan st
 }
 
 func (controller *InvoiceStreamController) writeMissingInvoices(c echo.Context, userId int64, ws *websocket.Conn, hash string) error {
-	invoices, err := controller.svc.InvoicesFor(c.Request().Context(), userId, common.InvoiceTypeIncoming)
+	invoices, _, err := controller.svc.InvoicesFor(c.Request().Context(), userId, common.InvoiceTypeIncoming)
 	if err != nil {
 		return err
 	}

@@ -90,8 +90,8 @@ func (suite *PaymentTestErrorsSuite) TestExternalFailingInvoice() {
 
 	//test an expired invoice
 	externalInvoice := lnrpc.Invoice{
-		Memo:  "integration tests: external pay from alice",
-		Value: int64(externalSatRequested),
+		Memo:   "integration tests: external pay from alice",
+		Value:  int64(externalSatRequested),
 		Expiry: 1,
 	}
 	invoice, err := suite.externalLND.AddInvoice(context.Background(), &externalInvoice)
@@ -130,7 +130,7 @@ func (suite *PaymentTestErrorsSuite) TestExternalFailingInvoice() {
 
 	userId := getUserIdFromToken(suite.userToken)
 
-	invoices, err := suite.service.InvoicesFor(context.Background(), userId, common.InvoiceTypeOutgoing)
+	invoices, _, err := suite.service.InvoicesFor(context.Background(), userId, common.InvoiceTypeOutgoing)
 	if err != nil {
 		fmt.Printf("Error when getting invoices %v\n", err.Error())
 	}

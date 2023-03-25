@@ -53,7 +53,7 @@ type Invoice struct {
 func (controller *InvoiceController) GetOutgoingInvoices(c echo.Context) error {
 	userId := c.Get("UserID").(int64)
 
-	invoices, err := controller.svc.InvoicesFor(c.Request().Context(), userId, common.InvoiceTypeOutgoing)
+	invoices, _, err := controller.svc.InvoicesFor(c.Request().Context(), userId, common.InvoiceTypeOutgoing)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func (controller *InvoiceController) GetOutgoingInvoices(c echo.Context) error {
 func (controller *InvoiceController) GetIncomingInvoices(c echo.Context) error {
 	userId := c.Get("UserID").(int64)
 
-	invoices, err := controller.svc.InvoicesFor(c.Request().Context(), userId, common.InvoiceTypeIncoming)
+	invoices, _, err := controller.svc.InvoicesFor(c.Request().Context(), userId, common.InvoiceTypeIncoming)
 	if err != nil {
 		return err
 	}

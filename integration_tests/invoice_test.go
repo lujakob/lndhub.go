@@ -73,13 +73,13 @@ func (suite *InvoiceTestSuite) TestZeroAmtTestSuite() {
 
 func (suite *InvoiceTestSuite) TestAddInvoiceWithoutToken() {
 	user, _ := suite.service.FindUserByLogin(context.Background(), suite.aliceLogin.Login)
-	invoicesBefore, _ := suite.service.InvoicesFor(context.Background(), user.ID, common.InvoiceTypeIncoming)
+	invoicesBefore, _, _ := suite.service.InvoicesFor(context.Background(), user.ID, common.InvoiceTypeIncoming)
 	assert.Equal(suite.T(), 0, len(invoicesBefore))
 
 	suite.createInvoiceReq(10, "test invoice without token", suite.aliceLogin.Login)
 
 	// check if invoice is added
-	invoicesAfter, _ := suite.service.InvoicesFor(context.Background(), user.ID, common.InvoiceTypeIncoming)
+	invoicesAfter, _, _ := suite.service.InvoicesFor(context.Background(), user.ID, common.InvoiceTypeIncoming)
 	assert.Equal(suite.T(), 1, len(invoicesAfter))
 }
 
