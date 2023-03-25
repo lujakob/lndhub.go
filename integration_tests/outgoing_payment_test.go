@@ -58,8 +58,8 @@ func (suite *PaymentTestSuite) TestOutGoingPayment() {
 	outgoingAccount, _ := suite.service.AccountFor(context.Background(), common.AccountTypeOutgoing, userId)
 	currentAccount, _ := suite.service.AccountFor(context.Background(), common.AccountTypeCurrent, userId)
 
-	outgoingInvoices, _ := suite.service.InvoicesFor(context.Background(), userId, common.InvoiceTypeOutgoing)
-	incomingInvoices, _ := suite.service.InvoicesFor(context.Background(), userId, common.InvoiceTypeIncoming)
+	outgoingInvoices, _, _ := suite.service.InvoicesFor(context.Background(), userId, common.InvoiceTypeOutgoing)
+	incomingInvoices, _, _ := suite.service.InvoicesFor(context.Background(), userId, common.InvoiceTypeIncoming)
 	assert.Equal(suite.T(), 1, len(outgoingInvoices))
 	assert.Equal(suite.T(), 1, len(incomingInvoices))
 
@@ -144,8 +144,8 @@ func (suite *PaymentTestSuite) TestOutGoingPaymentWithNegativeBalance() {
 	outgoingAccount, _ := suite.service.AccountFor(context.Background(), common.AccountTypeOutgoing, userId)
 	currentAccount, _ := suite.service.AccountFor(context.Background(), common.AccountTypeCurrent, userId)
 
-	outgoingInvoices, _ := suite.service.InvoicesFor(context.Background(), userId, common.InvoiceTypeOutgoing)
-	incomingInvoices, _ := suite.service.InvoicesFor(context.Background(), userId, common.InvoiceTypeIncoming)
+	outgoingInvoices, _, _ := suite.service.InvoicesFor(context.Background(), userId, common.InvoiceTypeOutgoing)
+	incomingInvoices, _, _ := suite.service.InvoicesFor(context.Background(), userId, common.InvoiceTypeIncoming)
 	assert.Equal(suite.T(), 1, len(outgoingInvoices))
 	assert.Equal(suite.T(), 1, len(incomingInvoices))
 
