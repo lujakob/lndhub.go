@@ -232,7 +232,7 @@ func (suite *PaymentTestSuite) TestInternalPaymentFail() {
 	_ = suite.createPayInvoiceReqError(bobInvoice.PayReq, suite.aliceToken)
 
 	userId := getUserIdFromToken(suite.aliceToken)
-	invoices, err := suite.service.InvoicesFor(context.Background(), userId, common.InvoiceTypeOutgoing)
+	invoices, _, err := suite.service.InvoicesFor(context.Background(), userId, common.InvoiceTypeOutgoing)
 	if err != nil {
 		fmt.Printf("Error when getting invoices %v\n", err.Error())
 	}
@@ -301,7 +301,7 @@ func (suite *PaymentTestSuite) TestInternalPaymentKeysend() {
 	bobBalance, _ := suite.service.CurrentUserBalance(context.Background(), bobId)
 	assert.Equal(suite.T(), int64(bobAmt)+previousBobBalance, bobBalance)
 	//check bob's invoices for whatsat message
-	invoicesBob, _ := suite.service.InvoicesFor(context.Background(), bobId, common.InvoiceTypeIncoming)
+	invoicesBob, _, _ := suite.service.InvoicesFor(context.Background(), bobId, common.InvoiceTypeIncoming)
 	foundKeySend := false
 	for _, invoice := range invoicesBob {
 		if invoice.Keysend {

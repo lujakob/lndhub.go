@@ -140,17 +140,35 @@ func (svc *LndhubService) TransactionEntriesFor(ctx context.Context, userId int6
 	return transactionEntries, err
 }
 
-func (svc *LndhubService) InvoicesFor(ctx context.Context, userId int64, invoiceType string) ([]models.Invoice, error) {
+type Pagination struct {
+	Limit  int
+	Offset int
+}
+
+func (svc *LndhubService) InvoicesFor(ctx context.Context, userId int64, invoiceType string, pagination ...Pagination) ([]models.Invoice, int, error) {
 	var invoices []models.Invoice
+
+	limit := 100
+	offset := 0
+
+	for _, p := range pagination {
+		if p.Limit != 0 {
+			limit = p.Limit
+		}
+
+		if p.Offset != 0 {
+			offset = p.Offset
+		}
+	}
 
 	query := svc.DB.NewSelect().Model(&invoices).Where("user_id = ?", userId)
 	if invoiceType != "" {
 		query.Where("type = ? AND state <> ?", invoiceType, common.InvoiceStateInitialized)
 	}
-	query.OrderExpr("id DESC").Limit(100)
-	err := query.Scan(ctx)
+	query.OrderExpr("id DESC").Limit(limit).Offset(offset)
+	count, err := query.ScanAndCount(ctx)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return invoices, nil
+	return invoices, count, nil
 }
